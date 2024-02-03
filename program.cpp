@@ -8,6 +8,8 @@ struct Solicitud {
     std::string origen;
     std::string destino;
     std::string usuario;
+    int numeroContagios;
+    bool esVulnerable;
     int edad;
     char sexo;
     int numeroQuejas;
@@ -15,15 +17,6 @@ struct Solicitud {
 
 // Contador para asignar IDs automáticamente
 int idUsuario = 1;
-
-// Prototipos de funciones
-//void mostrarMenu();
-//void agregarSolicitud(ListaSolicitudes & listaSolicitudes);
-//void mostrarTodasLasSolicitudes(ListaSolicitudes& listaSolicitudes);
-//void buscarSolicitudPorNombre(ListaSolicitudes& listaSolicitudes);
-//void mostrarSolicitudesOrdenadasPorNombre(ListaSolicitudes& listaSolicitudes);
-//void modificarNumeroQuejas(ListaSolicitudes& listaSolicitudes);
-//void mostrarUsuariosPorQuejas(ListaSolicitudes& listaSolicitudes);
 
 // Definición de la clase ListaSolicitudes
 class ListaSolicitudes {
@@ -39,9 +32,14 @@ public:
     // Método para mostrar todas las solicitudes en la lista
     void mostrarSolicitudes() const {
         for (const Solicitud& solicitud : solicitudes) {
-            std::cout << "ID: " << solicitud.id << ", Origen: " << solicitud.origen << ", Destino: " << solicitud.destino
-                      << ", Usuario: " << solicitud.usuario << ", Edad: " << solicitud.edad << ", Sexo: " << solicitud.sexo
-                      << ", Quejas: " << solicitud.numeroQuejas << std::endl;
+            std::cout<< "\n\tID: " << solicitud.id << "\n\tOrigen: " << solicitud.origen << "\n\tDestino: " << solicitud.destino
+                    << "\n\tUsuario: " << solicitud.usuario << "\n\tEdad: " << solicitud.edad << "\n\tSexo: " << solicitud.sexo
+                    << "\n\tQuejas: " << solicitud.numeroQuejas << "\n\tContagios: " << solicitud.numeroContagios;
+                    if (solicitud.esVulnerable) {
+    					std::cout << "\n\t(Usuario vulnerable)";
+					}
+					std::cout << std::endl;
+                      
         }
     }
 
@@ -65,11 +63,15 @@ public:
                 std::cout << "Solicitud encontrada:" << std::endl;
                 std::cout << "ID: " << solicitud.id << ", Origen: " << solicitud.origen << ", Destino: " << solicitud.destino
                           << ", Usuario: " << solicitud.usuario << ", Edad: " << solicitud.edad << ", Sexo: " << solicitud.sexo
-                          << ", Quejas: " << solicitud.numeroQuejas << std::endl;
+                          << ", Quejas: " << solicitud.numeroQuejas << ", Contagios: " << solicitud.numeroContagios;
+                    	  if (solicitud.esVulnerable) {
+    							std::cout << "\n\t(Usuario vulnerable)";
+							}
+						  std::cout << std::endl;
             }
         }
         if (!encontrado) {
-            std::cout << "No se encontró una solicitud con el nombre de usuario especificado." << std::endl;
+            std::cout << "\n\t\tNo se encontró una solicitud con el nombre de usuario especificado." << std::endl;
         }
     }
 
@@ -80,11 +82,15 @@ public:
             return a.usuario < b.usuario;
         });
 
-        std::cout << "Solicitudes ordenadas por nombre de usuario:" << std::endl;
+        std::cout << "\n\t\tSolicitudes ordenadas por nombre de usuario:" << std::endl;
         for (const Solicitud& solicitud : solicitudesOrdenadas) {
-            std::cout << "ID: " << solicitud.id << ", Origen: " << solicitud.origen << ", Destino: " << solicitud.destino
-                      << ", Usuario: " << solicitud.usuario << ", Edad: " << solicitud.edad << ", Sexo: " << solicitud.sexo
-                      << ", Quejas: " << solicitud.numeroQuejas << std::endl;
+            std::cout << "\n\tID: " << solicitud.id << "\n\tOrigen: " << solicitud.origen << "\n\tDestino: " << solicitud.destino
+                      << "\n\tUsuario: " << solicitud.usuario << "\n\tEdad: " << solicitud.edad << "\n\tSexo: " << solicitud.sexo
+                      << "\n\tQuejas: " << solicitud.numeroQuejas << "\n\tContagios: " << solicitud.numeroContagios;
+                    if (solicitud.esVulnerable) {
+    					std::cout << "\n\t(Usuario vulnerable)";
+					}
+					std::cout << std::endl;
         }
     }
 
@@ -95,9 +101,9 @@ public:
             return a.numeroQuejas > b.numeroQuejas;
         });
 
-        std::cout << "Usuarios ordenados por cantidad de quejas (de mayor a menor):" << std::endl;
+        std::cout << "\n\t\tUsuarios ordenados por cantidad de quejas (de mayor a menor):" << std::endl;
         for (const Solicitud& solicitud : usuariosOrdenadosPorQuejas) {
-            std::cout << "Usuario: " << solicitud.usuario << ", Quejas: " << solicitud.numeroQuejas << std::endl;
+            std::cout << "\n\tUsuario: " << solicitud.usuario << ", Quejas: " << solicitud.numeroQuejas << std::endl;
         }
     }
 
@@ -113,7 +119,7 @@ public:
                 solicitud.numeroQuejas = nuevoNumeroQuejas;
                 if (nuevoNumeroQuejas >= 5) {
                     eliminarSolicitudPorId(idUsuario);
-                    std::cout << "Usuario eliminado debido a quejas excesivas." << std::endl;
+                    std::cout << "\n\tUsuario eliminado debido a quejas excesivas." << std::endl;
                 }
                 return true; // Solicitud encontrada y número de quejas modificado
             }
@@ -122,121 +128,75 @@ public:
     }
 };
 
-// Función para mostrar el menú
-void mostrarMenu() {
-	system("cls");
-    std::cout << "\n\t\t\t--- Menú ---" << std::endl;
-    std::cout << "\n\t1. Agregar solicitud de viaje" << std::endl;
-    std::cout << "\t2. Mostrar todas las solicitudes" << std::endl;
-    std::cout << "\t3. Buscar solicitud por nombre de usuario" << std::endl;
-    std::cout << "\t4. Mostrar solicitudes ordenadas por nombre de usuario" << std::endl;
-    std::cout << "\t5. Modificar número de quejas de un usuario" << std::endl;
-    std::cout << "\t6. Mostrar usuarios ordenados por cantidad de quejas" << std::endl;
-    std::cout << "\t7. Salir" << std::endl;
-    std::cout << "\n\tIngrese el número de la opción deseada: ";
-}
+int main() {
+	
+    ListaSolicitudes listaSolicitudes;
+    
+	Solicitud solicitud;
+	
+    while (true) {
+        
+        // Asignar automáticamente un ID numérico
+        solicitud.id = ListaSolicitudes::asignarIdUsuario();
+        system("cls");
+		std::cout << "\n\t\tIngrese la solicitud de viaje:" << std::endl;
+        std::cout << "\n\tOrigen: ";
+        std::cin >> solicitud.origen;
+        std::cout << "\n\tDestino: ";
+        std::cin >> solicitud.destino;
+        std::cout << "\n\tUsuario: ";
+        std::cin >> solicitud.usuario;
+        std::cout << "\n\tEdad: ";
+        std::cin >> solicitud.edad;
+        std::cout << "\n\tSexo (M/F): ";
+        std::cin >> solicitud.sexo;
+        std::cout << "\n\tNúmero de quejas: ";
+        std::cin >> solicitud.numeroQuejas;
+        std::cout << "\n\tNúmero de contagios por COVID-19: ";
+		std::cin >> solicitud.numeroContagios;
+		solicitud.esVulnerable = (solicitud.numeroContagios >= 5);
 
-// Función para agregar una solicitud
-void agregarSolicitud(ListaSolicitudes& listaSolicitudes) {
-	system("cls");
-    std::cout << "\n\t\tIngrese la solicitud de viaje:" << std::endl;
-    Solicitud solicitud;
+        listaSolicitudes.agregarSolicitud(solicitud);
+		
+		system("cls");
+        std::cout << "\n\t\tLista de solicitudes actualizada:" << std::endl;
+        listaSolicitudes.mostrarSolicitudes();
 
-    // Asignar automáticamente un ID numérico
-    solicitud.id = ListaSolicitudes::asignarIdUsuario();
+        char respuesta;
+        std::cout << "\n\t¿Desea agregar otra solicitud? (s/n): ";
+        std::cin >> respuesta;
 
-    std::cout << "\n\tOrigen: ";
-    std::cin >> solicitud.origen;
-    std::cout << "\n\tDestino: ";
-    std::cin >> solicitud.destino;
-    std::cout << "\n\tUsuario: ";
-    std::cin >> solicitud.usuario;
-    std::cout << "\n\tEdad: ";
-    std::cin >> solicitud.edad;
-    std::cout << "\n\tSexo (M/F): ";
-    std::cin >> solicitud.sexo;
-    std::cout << "\n\tNúmero de quejas: ";
-    std::cin >> solicitud.numeroQuejas;
+        if (respuesta != 's' && respuesta != 'S') {
+            break;
+        }
+    }
 
-    listaSolicitudes.agregarSolicitud(solicitud);
-
-    std::cout << "\n\t\tSolicitud agregada con éxito." << std::endl;
-}
-
-// Función para mostrar todas las solicitudes
-void mostrarTodasLasSolicitudes(ListaSolicitudes& listaSolicitudes) {
-    std::cout << "Lista de todas las solicitudes:" << std::endl;
-    listaSolicitudes.mostrarSolicitudes();
-}
-
-// Función para buscar una solicitud por nombre de usuario
-void buscarSolicitudPorNombre(ListaSolicitudes& listaSolicitudes) {
-    std::string nombreBuscar;
-    std::cout << "Ingrese el nombre del usuario que desea buscar: ";
-    std::cin >> nombreBuscar;
-
-    listaSolicitudes.buscarSolicitudPorNombre(nombreBuscar);
-}
-
-// Función para mostrar solicitudes ordenadas por nombre de usuario
-void mostrarSolicitudesOrdenadasPorNombre(ListaSolicitudes& listaSolicitudes) {
-    listaSolicitudes.mostrarSolicitudesOrdenadasPorNombre();
-}
-
-// Función para modificar el número de quejas de un usuario
-void modificarNumeroQuejas(ListaSolicitudes& listaSolicitudes) {
+    // Solicitar al usuario el ID del usuario para modificar el número de quejas
     int idModificar, nuevoNumeroQuejas;
-    std::cout << "Ingrese el ID del usuario para modificar el número de quejas: ";
+    std::cout << "\n\tIngrese el ID del usuario para modificar el número de quejas: ";
     std::cin >> idModificar;
-    std::cout << "Ingrese el nuevo número de quejas: ";
+    std::cout << "\n\tIngrese el nuevo número de quejas: ";
     std::cin >> nuevoNumeroQuejas;
+    std::cout << "\n\tNúmero de contagios por COVID-19: ";
+	std::cin >> solicitud.numeroContagios;
+	// Etiquetar como usuario vulnerable si tiene 5 o más contagios
+	solicitud.esVulnerable = (solicitud.numeroContagios >= 1);
 
     if (listaSolicitudes.modificarNumeroQuejasPorId(idModificar, nuevoNumeroQuejas)) {
         std::cout << "Número de quejas modificado con éxito." << std::endl;
     } else {
         std::cout << "No se encontró una solicitud con el ID especificado." << std::endl;
     }
-}
 
-// Función para mostrar usuarios ordenados por cantidad de quejas
-void mostrarUsuariosPorQuejas(ListaSolicitudes& listaSolicitudes) {
+    // Mostrar todas las solicitudes ordenadas por nombre de usuario
+    listaSolicitudes.mostrarSolicitudesOrdenadasPorNombre();
+
+    // Mostrar usuarios ordenados por cantidad de quejas
     listaSolicitudes.mostrarUsuariosPorQuejas();
+
+    return 0;
 }
 
-int main() {
-    ListaSolicitudes listaSolicitudes;
 
-    while (true) {
-        mostrarMenu();
-        char opcion;
-        std::cin >> opcion;
-        std::cin.ignore(); // Limpiar el buffer del teclado
 
-        switch (opcion) {
-            case '1':
-                agregarSolicitud(listaSolicitudes);
-                break;
-            case '2':
-                mostrarTodasLasSolicitudes(listaSolicitudes);
-                break;
-            case '3':
-                buscarSolicitudPorNombre(listaSolicitudes);
-                break;
-            case '4':
-                mostrarSolicitudesOrdenadasPorNombre(listaSolicitudes);
-                break;
-            case '5':
-                modificarNumeroQuejas(listaSolicitudes);
-                break;
-            case '6':
-                mostrarUsuariosPorQuejas(listaSolicitudes);
-                break;
-            case '7':
-                std::cout << "Saliendo del programa..." << std::endl;
-                return 0;
-            default:
-                std::cout << "Opción no válida. Por favor, seleccione una opción válida." << std::endl;
-                break;
-        }
-    }
-}
+
